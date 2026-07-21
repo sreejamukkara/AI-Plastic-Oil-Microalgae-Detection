@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual Environment
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# YOLO Training
+runs/
+
+# Model Weights (optional - keep only if you don't want to upload them)
+*.pt
+
+# Database
+*.db
+
+# VS Code
+.vscode/
+
+# Environment Variables
+.env
+
+# Uploads
+uploads/
+# Datasets
+CODE/BACKEND/Ocean-Plastics-Waste-Detection---Float-Plastics-13/
+CODE/BACKEND/oil-spill-area-2/
+CODE/BACKEND/super_algae-2/
+
+# YOLO training outputs
+CODE/BACKEND/runs/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Python cache
+__pycache__/
+*.pt

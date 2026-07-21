@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PlasticOilAlgae AI - YOLOv9-Based Marine Pollutant Detection</title>
+  <link rel="shortcut icon" href="/static/images/pollutant_icon.png" type="image/png">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Google Fonts, Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+
+  <!-- Custom Styles -->
+  <style>
+    :root {
+      --primary-color: #FF6B6B;
+      --secondary-color: #4ECDC4;
+      --accent-color: #45B7D1;
+      --bg-light: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --text-dark: #1A202C;
+      --text-light: #718096;
+      --border-color: #E2E8F0;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: var(--card-bg);
+      box-shadow: var(--shadow);
+      padding: 1rem 0;
+      transition: all 0.3s ease;
+    }
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--primary-color);
+    }
+    .nav-link {
+      color: var(--text-light);
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--primary-color);
+      background: rgba(255, 107, 107, 0.1);
+    }
+
+    /* Hero Section - Full Width Centered */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+      color: white;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="waves" width="100" height="50" patternUnits="userSpaceOnUse"><path d="M0 20 Q25 10 50 20 T100 20 V50 H0 Z" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23waves)"/></svg>');
+      animation: wave 20s linear infinite;
+    }
+
+    @keyframes wave {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100px); }
+    }
+
+    .hero-content {
+      max-width: 800px;
+      padding: 0 2rem;
+      z-index: 2;
+      position: relative;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+
+    .hero-features {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-features li {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .hero-features i {
+      color: var(--primary-color);
+    }
+
+    .btn-primary {
+      background: var(--primary-color);
+      color: white;
+      padding: 1rem 2.5rem;
+      border-radius: 50px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+    }
+
+    .hero-visual {
+      margin-top: 3rem;
+    }
+
+    .visual-placeholder {
+      width: 300px;
+      height: 200px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      margin: 0 auto;
+      backdrop-filter: blur(10px);
+    }
+
+    .visual-caption {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    /* Methodology Section - Card Grid */
+    .methodology {
+      padding: 5rem 0;
+      background: var(--card-bg);
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 1rem;
+    }
+
+    .section-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-light);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .methodology-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .method-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+      border: 1px solid var(--border-color);
+    }
+
+    .method-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .method-number {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .method-card h3 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text-dark);
+    }
+
+    .method-card p {
+      color: var(--text-light);
+      margin-bottom: 1.5rem;
+    }
+
+    .tech-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tech-tag {
+      background: var(--bg-light);
+      padding: 0.25rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--text-light);
+      border: 1px solid var(--border-color);
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--text-dark);
+      color: white;
+      padding: 3rem 0 1.5rem;
+      text-align: center;
+    }
+
+    .footer-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .footer h4 {
+      margin-bottom: 1rem;
+      color: var(--secondary-color);
+    }
+
+    .footer p {
+      margin-bottom: 0.5rem;
+      opacity: 0.8;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.5rem;
+      }
+      
+      .hero-subtitle {
+        font-size: 1.1rem;
+      }
+      
+      .methodology-grid {
+        grid-template-columns: 1fr;
+        padding: 0 1rem;
+      }
+      
+      .visual-placeholder {
+        width: 250px;
+        height: 150px;
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="#"><i class="fas fa-water"></i> PlasticOilAlgae AI</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="{{ url_for('index') }}">
+              <i class="fas fa-home"></i> Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('about') }}">
+              <i class="fas fa-info-circle"></i> About
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{url_for('login')}}">
+              <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        YOLOv9-Based Detection of Plastic, Oil, and Micro Algae
+      </h1>
+      <p class="hero-subtitle">Real-time object detection for marine environmental monitoring and pollution assessment</p>
+      
+      <ul class="hero-features">
+        <li>
+          <i class="fas fa-check-circle"></i>
+          Detection of 3 key marine pollutants with bounding box localization
+        </li>
+      </ul>
+
+      <a href="#" class="btn-primary">
+        <i class="fas fa-rocket"></i> Start Detection
+      </a>
+
+      <div class="hero-visual">
+        <div class="visual-placeholder">
+          <i class="fas fa-recycle"></i>
+        </div>
+        <p class="visual-caption">Real-time pollutant detection with bounding boxes</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Methodology Section -->
+  <section class="methodology">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">YOLOv9 Methodology</h2>
+        <p class="section-subtitle">Advanced object detection pipeline for precise localization and classification of marine pollutants</p>
+      </div>
+
+      <div class="methodology-grid">
+        <div class="method-card">
+          <div class="method-number">01</div>
+          <h3>YOLOv9 Architecture & Training</h3>
+          <p>Custom YOLOv9 implementation with CSPDarknet backbone and PANet neck optimized for marine pollutant detection. Trained on 8,000 annotated underwater and surface images with extensive data augmentation including mosaic, mixup, and copy-paste.</p>
+          <div class="tech-stack">
+            <span class="tech-tag">YOLOv9</span>
+            <span class="tech-tag">CSPDarknet</span>
+            <span class="tech-tag">PANet</span>
+            <span class="tech-tag">Ultralytics</span>
+          </div>
+        </div>
+
+        <div class="method-card">
+          <div class="method-number">02</div>
+          <h3>Multi-Scale Object Detection</h3>
+          <p>Advanced feature pyramid network for detecting pollutants across multiple scales. Adaptive anchor boxes optimized for pollutant morphology with improved IoU matching and label assignment strategies.</p>
+          <div class="tech-stack">
+            <span class="tech-tag">FPN</span>
+            <span class="tech-tag">Adaptive Anchors</span>
+            <span class="tech-tag">Multi-Scale</span>
+            <span class="tech-tag">CIoU Loss</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+ 
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

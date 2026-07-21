@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PlasticOilAlgae AI - Pollutant Detection</title>
+  <link rel="shortcut icon" href="/static/images/pollutant_icon.png" type="image/png">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Google Fonts, Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+
+  <!-- Custom Styles -->
+  <style>
+    :root {
+      --primary-color: #FF6B6B;
+      --primary-dark: #E53E3E;
+      --primary-light: #FC8181;
+      --accent: #4ECDC4;
+      --bg-light: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --border-color: #E2E8F0;
+      --text-primary: #1A202C;
+      --text-secondary: #718096;
+      --text-muted: #A0AEC0;
+      --success: #38A169;
+      --error: #E53E3E;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-primary);
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Navigation */
+    .navbar {
+      background: var(--card-bg);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 0;
+    }
+
+    .navbar-brand {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 1.25rem;
+    }
+
+    .navbar-brand i {
+      color: var(--accent);
+      margin-right: 0.5rem;
+    }
+
+    .nav-link {
+      color: var(--text-secondary);
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      margin: 0 0.25rem;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .nav-link.active {
+      color: var(--accent);
+    }
+
+    /* Model Selection */
+    .model-selection {
+      margin-bottom: 2rem;
+    }
+
+    .model-select-label {
+      display: block;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.75rem;
+      font-size: 1rem;
+    }
+
+    .model-select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      background: white;
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+    }
+
+    .model-select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+    }
+
+    .model-description {
+      background: rgba(78, 205, 196, 0.1);
+      border: 1px solid rgba(78, 205, 196, 0.3);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    /* Upload Section */
+    .upload-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      background: linear-gradient(135deg, var(--bg-light) 0%, #E6F3FF 100%);
+    }
+
+    .upload-container {
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .upload-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 3rem 2.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+    }
+
+    .upload-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .upload-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--primary-color);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      color: white;
+      font-size: 1.5rem;
+    }
+
+    .upload-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .upload-subtitle {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+
+    /* File Upload */
+    .file-upload-area {
+      border: 2px dashed var(--border-color);
+      border-radius: 12px;
+      padding: 3rem 2rem;
+      text-align: center;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      margin-bottom: 1.5rem;
+      background: rgba(255, 255, 255, 0.5);
+      position: relative;
+    }
+
+    .file-upload-area:hover {
+      border-color: var(--primary-color);
+      background: rgba(255, 107, 107, 0.1);
+    }
+
+    .file-upload-area.dragover {
+      border-color: var(--accent);
+      background: rgba(78, 205, 196, 0.1);
+    }
+
+    .upload-area-icon {
+      font-size: 2.5rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .file-upload-area:hover .upload-area-icon {
+      color: var(--primary-color);
+    }
+
+    .upload-text {
+      color: var(--text-primary);
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .upload-hint {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .file-input {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    /* Preview */
+    .preview-container {
+      display: none;
+      margin-bottom: 1.5rem;
+    }
+
+    .preview-image {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      margin: 0 auto;
+    }
+
+    .file-info {
+      text-align: center;
+      margin-top: 1rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+      width: 100%;
+      background: var(--primary-color);
+      border: none;
+      padding: 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: none;
+    }
+
+    .submit-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    .submit-btn.loading {
+      pointer-events: none;
+      opacity: 0.8;
+    }
+
+    /* Processing Indicator */
+    .processing-indicator {
+      display: none;
+      text-align: center;
+      margin: 2rem 0;
+    }
+
+    .processing-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 107, 107, 0.2);
+      border-top: 3px solid var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    .processing-text {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Results Section */
+    .results-section {
+      display: none;
+      margin-top: 2rem;
+    }
+
+    .result-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .result-icon {
+      color: var(--accent);
+      font-size: 1.5rem;
+    }
+
+    .result-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .result-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .result-image-container {
+      text-align: center;
+    }
+
+    .result-image {
+      width: 100%;
+      max-width: 500px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .detection-info {
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .detection-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .detection-message {
+      background: {% if detection_message and "No " in detection_message %}rgba(229, 62, 62, 0.1){% else %}rgba(78, 205, 196, 0.1){% endif %};
+      border: 1px solid {% if detection_message and "No " in detection_message %}rgba(229, 62, 62, 0.3){% else %}rgba(78, 205, 196, 0.3){% endif %};
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .detection-status {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: {% if detection_message and 'No ' in detection_message %}var(--error){% else %}var(--accent){% endif %};
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .detected-classes {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    .detected-classes strong {
+      color: var(--text-primary);
+    }
+
+    .result-meta {
+      background: rgba(255, 107, 107, 0.1);
+      border: 1px solid rgba(255, 107, 107, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1.5rem;
+      text-align: center;
+      color: var(--primary-light);
+      font-size: 0.9rem;
+    }
+
+    .new-analysis-btn {
+      width: 100%;
+      background: var(--accent);
+      border: none;
+      padding: 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 2rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .new-analysis-btn:hover {
+      background: #3eb2a5;
+      transform: translateY(-1px);
+      color: white;
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--text-primary);
+      border-top: 1px solid var(--border-color);
+      padding: 2rem 0;
+      text-align: center;
+      color: white;
+    }
+
+    .footer-content {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .footer-logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: white;
+      margin-bottom: 1rem;
+    }
+
+    .footer-text {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .upload-card {
+        padding: 2rem 1.5rem;
+        margin: 0 1rem;
+      }
+      
+      .upload-title {
+        font-size: 1.5rem;
+      }
+      
+      .upload-icon {
+        width: 56px;
+        height: 56px;
+        font-size: 1.25rem;
+      }
+      
+      .file-upload-area {
+        padding: 2rem 1rem;
+      }
+      
+      .result-content {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      
+      .preview-image {
+        max-width: 350px;
+      }
+      
+      .result-image {
+        max-width: 400px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .upload-card {
+        padding: 1.5rem 1rem;
+      }
+      
+      .preview-image {
+        max-width: 300px;
+      }
+      
+      .result-image {
+        max-width: 350px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('home') }}">
+        <i class="fas fa-water"></i>PlasticOilAlgae AI
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('home') }}">Dashboard</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('upload') }}">Detection</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Upload Section -->
+  <section class="upload-section">
+    <div class="upload-container">
+      <div class="upload-card">
+        <div class="upload-header">
+          <div class="upload-icon">
+            <i class="fas fa-water"></i>
+          </div>
+          <h1 class="upload-title">Pollutant Detection</h1>
+          <p class="upload-subtitle">Upload underwater images for YOLOv9 analysis</p>
+        </div>
+
+        <form id="prediction-form" action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+          <!-- Model Selection -->
+          <div class="model-selection">
+            <label class="model-select-label">
+              <i class="fas fa-microscope"></i>
+              Select Detection Type
+            </label>
+            <select name="model_type" class="model-select" id="modelType" required>
+              <option value="plastic" {% if selected_model == 'plastic' %}selected{% endif %}>Plastic Waste Detection</option>
+              <option value="oil" {% if selected_model == 'oil' %}selected{% endif %}>Oil Spill Detection</option>
+              <option value="algae" {% if selected_model == 'algae' %}selected{% endif %}>Micro Algae Detection</option>
+            </select>
+            <div class="model-description" id="modelDescription">
+              {% if selected_model == 'plastic' %}
+                Detects: Glass, Metal, Plastic, Trash
+              {% elif selected_model == 'oil' %}
+                Detects: oil spill, oil_spillage
+              {% else %}
+                Detects: Micro Algae in water bodies
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- File Upload Area -->
+          <div class="file-upload-area" id="fileUploadArea">
+            <input type="file" id="image_file" name="image_file" class="file-input" accept="image/*" required>
+            <div class="upload-area-icon">
+              <i class="fas fa-cloud-upload-alt"></i>
+            </div>
+            <div>
+              <div class="upload-text">Choose an image or drag and drop</div>
+              <div class="upload-hint">JPG, PNG up to 10MB</div>
+            </div>
+          </div>
+
+          <!-- File Preview -->
+          <div class="preview-container" id="previewContainer">
+            <img id="previewImage" class="preview-image" alt="Preview">
+            <div class="file-info" id="fileInfo"></div>
+          </div>
+
+          <!-- Processing Indicator -->
+          <div class="processing-indicator" id="processingIndicator">
+            <div class="processing-spinner"></div>
+            <div class="processing-text">Analyzing with YOLOv9...</div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="submit-btn" id="submitButton">
+            <i class="fas fa-rocket"></i> Analyze Image
+          </button>
+        </form>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+          {% if result_image %}
+          <div class="result-card">
+            <div class="result-header">
+              <i class="fas fa-check-circle result-icon"></i>
+              <h3 class="result-title">Analysis Complete</h3>
+            </div>
+            
+            <div class="result-content">
+              <div class="result-image-container">
+                <img src="{{ result_image }}" class="result-image" alt="Detection Result">
+              </div>
+              
+              <div class="detection-info">
+                <div class="detection-title">
+                  <i class="fas fa-recycle"></i>
+                  Detection Results
+                </div>
+                
+                <!-- Detection Message -->
+                <div class="detection-message">
+                  <div class="detection-status">
+                    <i class="fas {% if detection_message and 'No ' in detection_message %}fa-exclamation-triangle{% else %}fa-check-circle{% endif %}"></i>
+                    {% if detection_message %}
+                      {{ detection_message.split(':')[0] }}
+                    {% else %}
+                      Pollutants Detected
+                    {% endif %}
+                  </div>
+                  <div class="detected-classes">
+                    {% if detection_message %}
+                      {% if "No " in detection_message %}
+                        <strong>No pollutants were detected in the uploaded image.</strong><br>
+                        Please ensure the image contains relevant content for the selected detection type.
+                      {% else %}
+                        <strong>Detected Classes:</strong><br>
+                        {{ detection_message.split(': ')[1] }}
+                      {% endif %}
+                    {% else %}
+                      <strong>Detected Classes:</strong><br>
+                      Analysis completed successfully
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="result-meta">
+              <i class="fas fa-bullseye"></i>
+              YOLOv9 Detection • {{ selected_model|title }} Analysis • Environmental Grade
+            </div>
+
+            <!-- New Analysis Button -->
+            <div style="text-align: center; margin-top: 2rem;">
+              <a href="{{ url_for('upload') }}" class="new-analysis-btn">
+                <i class="fas fa-plus"></i>
+                Analyze New Image
+              </a>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Custom JS -->
+  <script>
+    const fileInput = document.getElementById('image_file');
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const submitButton = document.getElementById('submitButton');
+    const previewContainer = document.getElementById('previewContainer');
+    const previewImage = document.getElementById('previewImage');
+    const fileInfo = document.getElementById('fileInfo');
+    const processingIndicator = document.getElementById('processingIndicator');
+    const resultsSection = document.getElementById('resultsSection');
+    const predictionForm = document.getElementById('prediction-form');
+    const modelType = document.getElementById('modelType');
+    const modelDescription = document.getElementById('modelDescription');
+
+    // Model descriptions
+    const modelDescriptions = {
+      plastic: "Detects: Beverage Cans, Glass Bottles, Plastic Bags, Plastic Bottles, Plastic wastes, Plastics Container, Plastics Trash",
+      oil: "Detects: Oil spills, oil-spill areas, and non-spill regions", 
+      algae: "Detects: Micro Algae in water bodies"
+    };
+
+    // Update model description when selection changes
+    modelType.addEventListener('change', function() {
+      modelDescription.textContent = modelDescriptions[this.value];
+    });
+
+    // File selection handler
+    fileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        // Validate file size
+        if (file.size > 10 * 1024 * 1024) {
+          alert('File size must be less than 10MB');
+          this.value = '';
+          return;
+        }
+
+        // Show preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewImage.src = e.target.result;
+          fileInfo.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+          previewContainer.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+
+        // Show submit button
+        submitButton.style.display = 'block';
+      }
+    });
+
+    // Drag and drop functionality
+    fileUploadArea.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      fileUploadArea.classList.add('dragover');
+    });
+
+    fileUploadArea.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      fileUploadArea.classList.remove('dragover');
+    });
+
+    fileUploadArea.addEventListener('drop', function(e) {
+      e.preventDefault();
+      fileUploadArea.classList.remove('dragover');
+      
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        fileInput.files = files;
+        const event = new Event('change', { bubbles: true });
+        fileInput.dispatchEvent(event);
+      }
+    });
+
+    // Form submission
+    predictionForm.addEventListener('submit', function(e) {
+      if (fileInput.files.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      
+      // Show loading state
+      submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+      submitButton.classList.add('loading');
+      processingIndicator.style.display = 'block';
+      submitButton.disabled = true;
+    });
+
+    // Show results if available on page load
+    window.addEventListener('load', function() {
+      if (resultsSection.children.length > 0) {
+        resultsSection.style.display = 'block';
+        previewContainer.style.display = 'none';
+        submitButton.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
