@@ -83,7 +83,7 @@ Additionally, the application includes a **voice assistant** that allows users t
 
 <p align="center">
 
-<img src="CODE/assets/or(1).png" width="850">
+<img src="CODE/assets/or (1).png" width="850">
 
 </p>
 
@@ -93,7 +93,7 @@ Additionally, the application includes a **voice assistant** that allows users t
 
 <p align="center">
 
-<img src="CODE/assets/ar(1).png" width="850">
+<img src="CODE/assets/ar (1).png" width="850">
 
 </p>
 
